@@ -4,21 +4,27 @@ local widget = require( "widget" )
 local scene = composer.newScene()
 
 local infoText
-local amountText
-local amountField
+local cardField
+local amountValue
 
-local function handleCheckout( event )
+local function handlePay( event )
  
     if ( "ended" == event.phase ) then
-    	composer.setVariable( "amountValue",  amountField.text)
-        composer.gotoScene( "customer" )
+        composer.gotoScene( "process" )
+    end
+end 
+
+local function handleReset( event )
+ 
+    if ( "ended" == event.phase ) then
+        composer.gotoScene( "new" )
     end
 end 
  
-local checkoutButton = widget.newButton(
+local payButton = widget.newButton(
     {
         label = "button",
-        onEvent = handleCheckout,
+        onEvent = handlePay,
         emboss = false,
         -- Properties for a rounded rectangle button
         shape = "roundedRect",
@@ -29,6 +35,21 @@ local checkoutButton = widget.newButton(
         fillColor = { default={0,0.7,0,1}, over={0,0.7,0,1} }
     }
 )
+
+local resetButton = widget.newButton(
+    {
+        label = "button",
+        onEvent = handleReset,
+        emboss = false,
+        -- Properties for a rounded rectangle button
+        shape = "roundedRect",
+        width = 200,
+        height = 40,
+        cornerRadius = 2,
+        labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
+        fillColor = { default={0.9,0.7,0.1,1}, over={0.9,0.7,0.1,1} }
+    }
+)
  
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
@@ -36,19 +57,8 @@ local checkoutButton = widget.newButton(
 -- -----------------------------------------------------------------------------------
 
 -- Function to handle button events
-
-local function toggleButton ( button )
-	if ( button.isEnabled ) then
-		button:setEnabled( false )
-		button.alpha = 0.25 
-	else
-		button:setEnabled( true )
-		button.alpha = 1 	
-	end
-
-end
  
-local function onEnterAmount( event )
+local function onEnterCard( event )
     -- Hide keyboard when the user clicks "Return" in this field
     if ( "submitted" == event.phase ) then
         native.setKeyboardFocus( nil )
@@ -56,15 +66,14 @@ local function onEnterAmount( event )
     elseif ( "editing" == event.phase) then
     
     	-- check we dont have an empty field
-		if (amountField.text == "" ) then
-			amountField.text = 0
-			toggleButton( checkoutButton )
+		if (string.len(cardField.text) == 8 ) then
+			payButton:setEnabled( true )
+			payButton.alpha = 1 
 		else
-			toggleButton( checkoutButton )		
+			payButton:setEnabled( false )
+			payButton.alpha = 0.25 		
 		end
 		
-		-- output a nicely formatted version of the amount
-		amountText.text = string.format("£%.2f", amountField.text )
     end
 end
  
@@ -78,7 +87,6 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
- 
 end
  
  
@@ -90,37 +98,42 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        composer.setVariable( "amountValue", 0 )
+        amountValue = composer.getVariable( "amountValue" )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         
         -- setup info screen
-        infoText = display.newText( "Enter Amount GBP", display.contentCenterX, 130, native.systemFont, 35 )
+        infoText = display.newText( "Enter Card Number", display.contentCenterX, 130, native.systemFont, 35 )
+        amountText = display.newText( string.format("£%.2f", amountValue ), display.contentCenterX, 170, native.systemFont, 35 )
         
         -- setup amount 
-        amountText = display.newText( "£00.00", display.contentCenterX, 170, native.systemFont, 35 )
-        amountField = native.newTextField( display.contentCenterX, 220, 320, 35 )
-		amountField.inputType = "decimal"
-		amountField.align = "center"
-		amountField:addEventListener( "userInput", onEnterAmount )
+        cardField = native.newTextField( display.contentCenterX, 220, 320, 35 )
+		cardField.inputType = "number"
+		cardField.align = "center"
+		cardField:addEventListener( "userInput", onEnterCard )
 		
 		-- focus on the field automatically
-		native.setKeyboardFocus( amountField )
+		native.setKeyboardFocus( cardField )
 		
 		--setup buttons
-		checkoutButton.x = display.contentCenterX
-		checkoutButton.y = 270
+		payButton.x = display.contentCenterX
+		payButton.y = 270
+		resetButton.x = display.contentCenterX
+		resetButton.y = 320
  
 		-- Change the button's label text
-		checkoutButton:setLabel( "Checkout" )
-		checkoutButton:setEnabled( false )
-		checkoutButton.alpha = 0.25
+		payButton:setLabel( "Pay" )
+		payButton:setEnabled( false )
+		payButton.alpha = 0.25
+		
+		resetButton:setLabel( "Reset" )
 		
 		sceneGroup:insert(infoText)
 		sceneGroup:insert(amountText)
-		sceneGroup:insert(amountField)
-		sceneGroup:insert(checkoutButton)
+		sceneGroup:insert(cardField)
+		sceneGroup:insert(payButton)
+		sceneGroup:insert(resetButton)
     end
 end
  

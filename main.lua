@@ -13,4 +13,5 @@ background.x = display.contentCenterX
 background.y = 60
 
 -- Merchant starts a new transaction
+composer.recycleOnSceneChange = true
 composer.gotoScene( "new" )

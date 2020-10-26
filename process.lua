@@ -4,21 +4,19 @@ local widget = require( "widget" )
 local scene = composer.newScene()
 
 local infoText
-local amountText
-local amountField
+local confirmText
 
-local function handleCheckout( event )
+local function handleReset( event )
  
     if ( "ended" == event.phase ) then
-    	composer.setVariable( "amountValue",  amountField.text)
-        composer.gotoScene( "customer" )
+        composer.gotoScene( "new" )
     end
 end 
  
-local checkoutButton = widget.newButton(
+local resetButton = widget.newButton(
     {
         label = "button",
-        onEvent = handleCheckout,
+        onEvent = handleReset,
         emboss = false,
         -- Properties for a rounded rectangle button
         shape = "roundedRect",
@@ -26,7 +24,7 @@ local checkoutButton = widget.newButton(
         height = 40,
         cornerRadius = 2,
         labelColor = { default={ 1, 1, 1 }, over={ 0, 0, 0, 0.5 } },
-        fillColor = { default={0,0.7,0,1}, over={0,0.7,0,1} }
+        fillColor = { default={0.9,0.7,0.1,1}, over={0.9,0.7,0.1,1} }
     }
 )
  
@@ -36,38 +34,17 @@ local checkoutButton = widget.newButton(
 -- -----------------------------------------------------------------------------------
 
 -- Function to handle button events
-
-local function toggleButton ( button )
-	if ( button.isEnabled ) then
-		button:setEnabled( false )
-		button.alpha = 0.25 
-	else
-		button:setEnabled( true )
-		button.alpha = 1 	
-	end
-
-end
  
-local function onEnterAmount( event )
-    -- Hide keyboard when the user clicks "Return" in this field
-    if ( "submitted" == event.phase ) then
-        native.setKeyboardFocus( nil )
-    
-    elseif ( "editing" == event.phase) then
-    
-    	-- check we dont have an empty field
-		if (amountField.text == "" ) then
-			amountField.text = 0
-			toggleButton( checkoutButton )
-		else
-			toggleButton( checkoutButton )		
-		end
-		
-		-- output a nicely formatted version of the amount
-		amountText.text = string.format("£%.2f", amountField.text )
-    end
-end
+ function processPayment()
  
+ 	--Fake payment processing here
+ 	
+ 	infoText.text = "Payment"
+ 	confirmText.text = "Sucessful"
+ 
+ 	resetButton:setEnabled( true )
+	resetButton.alpha = 1
+ end
  
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -78,7 +55,6 @@ function scene:create( event )
  
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
- 
 end
  
  
@@ -90,37 +66,27 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        composer.setVariable( "amountValue", 0 )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         
         -- setup info screen
-        infoText = display.newText( "Enter Amount GBP", display.contentCenterX, 130, native.systemFont, 35 )
+        infoText = display.newText( "Processing Payment", display.contentCenterX, 130, native.systemFont, 35 )
+        confirmText = display.newText( "", display.contentCenterX, 170, native.systemFont, 35 )
         
-        -- setup amount 
-        amountText = display.newText( "£00.00", display.contentCenterX, 170, native.systemFont, 35 )
-        amountField = native.newTextField( display.contentCenterX, 220, 320, 35 )
-		amountField.inputType = "decimal"
-		amountField.align = "center"
-		amountField:addEventListener( "userInput", onEnterAmount )
-		
-		-- focus on the field automatically
-		native.setKeyboardFocus( amountField )
-		
-		--setup buttons
-		checkoutButton.x = display.contentCenterX
-		checkoutButton.y = 270
+		resetButton.x = display.contentCenterX
+		resetButton.y = 270
  
 		-- Change the button's label text
-		checkoutButton:setLabel( "Checkout" )
-		checkoutButton:setEnabled( false )
-		checkoutButton.alpha = 0.25
+		resetButton:setEnabled( false )
+		resetButton.alpha = 0.25
+		resetButton:setLabel( "Reset" )
 		
 		sceneGroup:insert(infoText)
-		sceneGroup:insert(amountText)
-		sceneGroup:insert(amountField)
-		sceneGroup:insert(checkoutButton)
+		sceneGroup:insert(confirmText)
+		sceneGroup:insert(resetButton)
+		
+		timer.performWithDelay( 2000, processPayment )
     end
 end
  
