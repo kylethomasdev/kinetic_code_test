@@ -11,6 +11,8 @@ local function handlePay( event )
  
     if ( "ended" == event.phase ) then
         composer.gotoScene( "process" )
+        composer.setVariable( "cardValue", cardField.text )
+        native.setKeyboardFocus( nil )
     end
 end 
 
@@ -18,6 +20,7 @@ local function handleReset( event )
  
     if ( "ended" == event.phase ) then
         composer.gotoScene( "new" )
+        native.setKeyboardFocus( nil )
     end
 end 
  
@@ -61,7 +64,7 @@ local resetButton = widget.newButton(
 local function onEnterCard( event )
     -- Hide keyboard when the user clicks "Return" in this field
     if ( "submitted" == event.phase ) then
-        native.setKeyboardFocus( nil )
+        native.setKeyboardFocus( cardField )
     
     elseif ( "editing" == event.phase) then
     

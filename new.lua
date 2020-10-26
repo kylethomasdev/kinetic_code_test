@@ -12,6 +12,7 @@ local function handleCheckout( event )
     if ( "ended" == event.phase ) then
     	composer.setVariable( "amountValue",  amountField.text)
         composer.gotoScene( "customer" )
+        native.setKeyboardFocus( nil )
     end
 end 
  
@@ -51,7 +52,7 @@ end
 local function onEnterAmount( event )
     -- Hide keyboard when the user clicks "Return" in this field
     if ( "submitted" == event.phase ) then
-        native.setKeyboardFocus( nil )
+        native.setKeyboardFocus( amountField )
     
     elseif ( "editing" == event.phase) then
     
@@ -91,6 +92,7 @@ function scene:show( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
         composer.setVariable( "amountValue", 0 )
+        composer.setVariable( "cardValue", 0 )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen

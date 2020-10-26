@@ -5,11 +5,14 @@ local scene = composer.newScene()
 
 local infoText
 local confirmText
+local amountValue
+local cardValue
 
 local function handleReset( event )
  
     if ( "ended" == event.phase ) then
         composer.gotoScene( "new" )
+        native.setKeyboardFocus( nil )
     end
 end 
  
@@ -66,6 +69,8 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
+        amountValue = composer.getVariable( "amountValue" )
+       	cardValue = composer.getVariable( "cardValue" )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
