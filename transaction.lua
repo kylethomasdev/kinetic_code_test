@@ -3,7 +3,7 @@
 -- transaction.lua
 --
 -----------------------------------------------------------------------------------------
-local crypto = require( "crypto" )
+--local crypto = require( "crypto" )
 
 
 function newTransaction ()
@@ -11,7 +11,8 @@ function newTransaction ()
     
 	local setCard = function (card)
 						if (string.len(card) == 8 and string.len(card) < 9) then
-                    		self.transactionCard = crypto.hmac( crypto.sha256, card, "thisisasuperlongkey" )
+                    		--self.transactionCard = crypto.hmac( crypto.sha256, card, "thisisasuperlongkey" )
+                    		self.transactionCard = card
                     	else
                     		error("Card must be 8 characters long")
                     	end
@@ -29,9 +30,14 @@ function newTransaction ()
     
     local getAmount = function () return self.transactionAmount end
     
-    local processPayment = function ( debug ) 
-    							-- fake method to goto online payment
-    							return debug 
+    local processPayment = function ( debug )
+    							
+    							if( self.transactionAmount == nil and self.transactionCard == nil) then
+    								error("Card and Amount must be set")
+    							else
+    								-- fake method to goto online payment
+    								return debug
+    							end
     						end
     
     return {
