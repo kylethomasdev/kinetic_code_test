@@ -6,6 +6,7 @@
 
 -- Your code here
 local composer = require( "composer" )
+require( "transaction")
 
 -- Setup theme
 local background = display.newImageRect( "kinetic_logo.png", 270, 66 )

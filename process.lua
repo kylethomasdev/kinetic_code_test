@@ -5,8 +5,7 @@ local scene = composer.newScene()
 
 local infoText
 local confirmText
-local amountValue
-local cardValue
+local transaction
 
 local function handleReset( event )
  
@@ -40,10 +39,13 @@ local resetButton = widget.newButton(
  
  function processPayment()
  
- 	--Fake payment processing here
- 	
  	infoText.text = "Payment"
- 	confirmText.text = "Sucessful"
+ 	
+ 	if (transaction.processPayment(true)) then
+ 		confirmText.text = "Sucessful"
+ 	else
+ 		confirmText.text = "Declined"
+ 	end
  
  	resetButton:setEnabled( true )
 	resetButton.alpha = 1
@@ -69,8 +71,7 @@ function scene:show( event )
  
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        amountValue = composer.getVariable( "amountValue" )
-       	cardValue = composer.getVariable( "cardValue" )
+        transaction = composer.getVariable( "transaction" )
  
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen

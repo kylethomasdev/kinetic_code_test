@@ -6,11 +6,13 @@ local scene = composer.newScene()
 local infoText
 local amountText
 local amountField
+local transaction 
 
 local function handleCheckout( event )
  
     if ( "ended" == event.phase ) then
-    	composer.setVariable( "amountValue",  amountField.text)
+    	transaction = newTransaction(amountField.text)
+    	composer.setVariable( "transaction",  transaction)
         composer.gotoScene( "customer" )
         native.setKeyboardFocus( nil )
     end
