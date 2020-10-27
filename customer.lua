@@ -72,7 +72,7 @@ local function onEnterCard( event )
     elseif ( "editing" == event.phase) then
     
     	-- check we dont have an empty field
-		if (string.len(cardField.text) == 8 ) then
+		if (string.len(cardField.text) == 8 and string.len(cardField.text) < 9) then
 			payButton:setEnabled( true )
 			payButton.alpha = 1 
 		else

@@ -11,7 +11,8 @@ local transaction
 local function handleCheckout( event )
  
     if ( "ended" == event.phase ) then
-    	transaction = newTransaction(amountField.text)
+    	transaction = newTransaction()
+    	transaction.setAmount(amountField.text)
     	composer.setVariable( "transaction",  transaction)
         composer.gotoScene( "customer" )
         native.setKeyboardFocus( nil )
